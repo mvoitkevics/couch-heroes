@@ -1,5 +1,6 @@
 ﻿import RoomManager from '../managers/roomManager'
 import { GameSocket } from '../customTypes';
+import SocketIO from 'socket.io';
 
 /** Handles all the communication for /game namespace (ioNspGame) */
 export default class Game {
@@ -12,7 +13,6 @@ export default class Game {
             socket.on('joinRoom', async (data: { scene: string; level: number }) => {
                 const { scene, level } = data
                 await roomManager.joinRoom(socket, scene, +level)
-
             })
 
             socket.on('disconnect', () => {

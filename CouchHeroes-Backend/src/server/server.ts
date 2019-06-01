@@ -18,11 +18,17 @@ import Game from './socket/game'
 
 const port = process.env.PORT || 3000
 
-// create 2 socket.io namespaces
+// create socket.io namespace
 const ioNspGame = io.of('/G' /* short for game */)
+const ioNspController = io.of('/C' /* short for controller */)
 
 const roomManager = new RoomManager(ioNspGame)
-const ioGame = new Game(ioNspGame, roomManager)
+
+// /G namespace
+const ioGame = new Game(ioNspGame, roomManager);
+
+// /C namespace
+const ioController = new Game(ioNspController, roomManager);
 
 app.use(helmet())
 app.use(compression())
