@@ -52,13 +52,11 @@ var RoomManager = /** @class */ (function () {
         var _this = this;
         this.ioNspGame = ioNspGame;
         this.rooms = {};
-        this.createRoom = function (roomId, scene, level) { return __awaiter(_this, void 0, void 0, function () {
+        this.createRoom = function (roomId) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 this.rooms[roomId] = {
                     roomId: roomId,
                     users: {},
-                    // @ts-ignore
-                    scene: game.scene.keys['MainScene'],
                     removing: false
                 };
                 return [2 /*return*/];
@@ -72,8 +70,6 @@ var RoomManager = /** @class */ (function () {
                 this.rooms[roomId].removing = true;
                 setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
-                        // @ts-ignore
-                        this.rooms[roomId].game = null;
                         delete this.rooms[roomId];
                         return [2 /*return*/];
                     });
@@ -81,8 +77,7 @@ var RoomManager = /** @class */ (function () {
                 return [2 /*return*/];
             });
         }); };
-        this.chooseRoom = function (props) {
-            var scene = props.scene, level = props.level;
+        this.chooseRoom = function () {
             var rooms = Object.keys(_this.rooms);
             if (rooms.length === 0)
                 return uuidv4();
@@ -113,23 +108,29 @@ var RoomManager = /** @class */ (function () {
         socket.emit('clientId', clientId);
     };
     // the 2 functions below should be better
-    RoomManager.prototype.joinRoom = function (socket, scene, level) {
+    RoomManager.prototype.joinRoom = function (socket, isScreen) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (typeof scene !== 'string' || typeof level !== 'number') {
-                            console.error('level or scene is not defined in ioGame.ts');
-                            return [2 /*return*/];
-                        }
-                        socket.room = this.chooseRoom({ scene: scene, level: +level });
+                        socket.room = this.chooseRoom();
                         if (!!this.rooms[socket.room]) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.createRoom(socket.room, scene, +level)];
+                        return [4 /*yield*/, this.createRoom(socket.room)];
                     case 1:
                         _a.sent();
                         _a.label = 2;
                     case 2:
-                        this.addUser(socket);
+                        console.log('hello: ', isScreen);
+                        // dont add user if its a screen
+                        if (!isScreen) {
+                            this.addUser(socket);
+                        }
+                        else {
+                            // join the socket room
+                            socket.join(socket.room);
+                            socket.emit('roomId', { roomId: socket.room });
+                            console.log('emitting roomId: ', socket.room);
+                        }
                         return [2 /*return*/];
                 }
             });
@@ -141,16 +142,16 @@ var RoomManager = /** @class */ (function () {
             .in(socket.room)
             .emit('S' /* short for syncGame */, { connectCounter: this.getRoomUsersArray(socket.room).length });
     };
-    RoomManager.prototype.changeRoom = function (socket, scene, level) {
+    RoomManager.prototype.changeRoom = function (socket, isScreen) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.leaveRoom(socket);
-                        return [4 /*yield*/, this.joinRoom(socket, scene, +level)];
+                        return [4 /*yield*/, this.joinRoom(socket, isScreen)];
                     case 1:
                         _a.sent();
-                        socket.emit('changingRoom', { scene: scene, level: +level });
+                        socket.emit('changingRoom');
                         return [2 /*return*/];
                 }
             });
@@ -163,7 +164,8 @@ var RoomManager = /** @class */ (function () {
                 roomId: socket.room,
                 lastUpdate: Date.now(),
                 clientId: socket.clientId,
-                id: socket.id
+                id: socket.id,
+                isMaster: false
             },
             _a);
         this.rooms[socket.room].users = __assign({}, this.rooms[socket.room].users, newUsers);

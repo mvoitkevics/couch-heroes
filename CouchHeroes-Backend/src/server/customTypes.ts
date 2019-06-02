@@ -11,6 +11,7 @@ export interface User {
     lastUpdate: number
     clientId: number
     roomId: string
+    isMaster: boolean
 }
 export interface Users {
     [userId: string]: User

@@ -11,11 +11,16 @@ var io = SocketIOStatic(server);
 import RoomManager from './managers/roomManager';
 import Routes from './routes/routes';
 import Game from './socket/game';
+import Controller from './socket/controller';
 var port = process.env.PORT || 3000;
-// create 2 socket.io namespaces
+// create socket.io namespace
 var ioNspGame = io.of('/G' /* short for game */);
+var ioNspController = io.of('/C' /* short for controller */);
 var roomManager = new RoomManager(ioNspGame);
+// /G namespace
 var ioGame = new Game(ioNspGame, roomManager);
+// /C namespace
+var ioController = new Controller(ioNspController, roomManager);
 app.use(helmet());
 app.use(compression());
 app.set('view engine', 'ejs');

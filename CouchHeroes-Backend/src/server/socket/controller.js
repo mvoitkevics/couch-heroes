@@ -33,14 +33,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-/** Handles all the communication for /game namespace (ioNspGame) */
-var Game = /** @class */ (function () {
-    function Game(ioNspGame, roomManager) {
+/** Handles all the communication for /controller namespace (ioNspController) */
+var Controller = /** @class */ (function () {
+    function Controller(ioNspController, roomManager) {
         var _this = this;
-        this.ioNspGame = ioNspGame;
+        this.ioNspController = ioNspController;
         this.roomManager = roomManager;
         this.time = new Date();
-        ioNspGame.on('connection', function (socket) { return __awaiter(_this, void 0, void 0, function () {
+        ioNspController.on('connection', function (socket) { return __awaiter(_this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 roomManager.generateClientId(socket);
@@ -49,7 +49,6 @@ var Game = /** @class */ (function () {
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                console.log('receiving data from client: ', data.isScreen);
                                 isScreen = data.isScreen;
                                 return [4 /*yield*/, roomManager.joinRoom(socket, isScreen)];
                             case 1:
@@ -60,14 +59,6 @@ var Game = /** @class */ (function () {
                 }); });
                 socket.on('disconnect', function () {
                     roomManager.leaveRoom(socket);
-                    console.log('disconnected');
-                });
-                socket.on('changeRoom', function (data) {
-                    var isScreen = data.isScreen;
-                    roomManager.changeRoom(socket, isScreen);
-                });
-                socket.on('sendPing', function (id) {
-                    socket.emit('getPong', id);
                 });
                 socket.on('U' /* short for updateDude */, function (updates) {
                     if (roomManager.isRemoving(socket.room))
@@ -75,6 +66,10 @@ var Game = /** @class */ (function () {
                     if (!roomManager.userExists(socket.room, socket.id))
                         return;
                     roomManager.rooms[socket.room].users[socket.id].lastUpdate = Date.now();
+                    //roomManager.rooms[socket.room].scene.events.emit('U' /* short for updateDude */, {
+                    //    clientId: socket.clientId,
+                    //    updates
+                    //})
                 });
                 socket.on('getInitialState', function () {
                     if (roomManager.isRemoving(socket.room))
@@ -96,7 +91,7 @@ var Game = /** @class */ (function () {
             });
         }); });
     }
-    return Game;
+    return Controller;
 }());
-export default Game;
-//# sourceMappingURL=game.js.map
+export default Controller;
+//# sourceMappingURL=controller.js.map

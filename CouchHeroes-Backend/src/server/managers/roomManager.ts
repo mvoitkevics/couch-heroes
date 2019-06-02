@@ -16,24 +16,30 @@ export default class RoomManager {
 
     generateClientId(socket: GameSocket) {
         let clientId = Math.random() * 1000;
-        socket.clientId = clientId
-        socket.emit('clientId', clientId)
+        socket.clientId = clientId;
+        socket.emit('clientId', clientId);
     }
 
     // the 2 functions below should be better
-    async joinRoom(socket: GameSocket, scene: string, level: number) {
-        if (typeof scene !== 'string' || typeof level !== 'number') {
-            console.error('level or scene is not defined in ioGame.ts')
-            return
-        }
-        socket.room = this.chooseRoom({ scene: scene, level: +level })
+    async joinRoom(socket: GameSocket, isScreen: boolean) {
+        socket.room = this.chooseRoom();
 
         // create a new game instance if this room does not exist yet
         if (!this.rooms[socket.room]) {
-            await this.createRoom(socket.room, scene, +level)
+            await this.createRoom(socket.room)
         }
+        console.log('hello: ', isScreen);
+        // dont add user if its a screen
+        if (!isScreen) {
+            this.addUser(socket)
+        } else {
+            // join the socket room
+            socket.join(socket.room)
 
-        this.addUser(socket)
+            socket.emit('roomId', socket.room);
+
+            console.log('emitting roomId: ', socket.room);
+        }
     }
 
     leaveRoom(socket: GameSocket) {
@@ -43,10 +49,10 @@ export default class RoomManager {
             .emit('S' /* short for syncGame */, { connectCounter: this.getRoomUsersArray(socket.room).length })
     }
 
-    async changeRoom(socket: GameSocket, scene: string, level: number) {
+    async changeRoom(socket: GameSocket, isScreen: boolean) {
         this.leaveRoom(socket)
-        await this.joinRoom(socket, scene, +level)
-        socket.emit('changingRoom', { scene: scene, level: +level })
+        await this.joinRoom(socket, isScreen)
+        socket.emit('changingRoom')
     }
 
     addUser(socket: GameSocket) {
@@ -55,7 +61,8 @@ export default class RoomManager {
                 roomId: socket.room,
                 lastUpdate: Date.now(),
                 clientId: socket.clientId,
-                id: socket.id
+                id: socket.id,
+                isMaster: false
             }
         }
 
@@ -95,13 +102,11 @@ export default class RoomManager {
         else return false
     }
 
-    createRoom = async (roomId: string, scene: string, level: number) => {
+    createRoom = async (roomId: string) => {
 
         this.rooms[roomId] = {
             roomId: roomId,
             users: {},
-            // @ts-ignore
-            scene: game.scene.keys['MainScene'],
             removing: false
         }
     }
@@ -112,18 +117,14 @@ export default class RoomManager {
         this.rooms[roomId].removing = true
 
         setTimeout(async () => {
-            // @ts-ignore
-            this.rooms[roomId].game = null
             delete this.rooms[roomId]
         }, 5000)
     }
 
-    chooseRoom = (props: { scene: string; level: number }): string => {
-        const { scene, level } = props
-
+    chooseRoom = (): string => {
         let rooms = Object.keys(this.rooms)
 
-        if (rooms.length === 0) return uuidv4()
+        if (rooms.length === 0) return this.generateRoomID(4)
 
         // check for the next room with 1 or more free spaces
         let chosenRoom = null
@@ -140,8 +141,18 @@ export default class RoomManager {
         }
         if (chosenRoom) return chosenRoom
 
-        // create a new room with a new uuidv4 id
-        return uuidv4()
+        // create a new room with a new 4 letter id
+        return this.generateRoomID(4);
+    }
+
+    generateRoomID = (size: number): string => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const charactersLength = characters.length;
+        for (let i = 0; i < size; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
     }
 
     getRoomsArray() {

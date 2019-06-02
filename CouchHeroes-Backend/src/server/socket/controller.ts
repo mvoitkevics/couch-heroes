@@ -2,33 +2,21 @@
 import { GameSocket } from '../customTypes';
 import SocketIO from 'socket.io';
 
-/** Handles all the communication for /game namespace (ioNspGame) */
-export default class Game {
+/** Handles all the communication for /controller namespace (ioNspController) */
+export default class Controller {
     time = new Date()
 
-    constructor(public ioNspGame: SocketIO.Namespace, public roomManager: RoomManager) {
-        ioNspGame.on('connection', async (socket: GameSocket) => {
-            console.log('connected');
+    constructor(public ioNspController: SocketIO.Namespace, public roomManager: RoomManager) {
+        ioNspController.on('connection', async (socket: GameSocket) => {
             roomManager.generateClientId(socket)
 
             socket.on('joinRoom', async (data: { isScreen: boolean }) => {
-                console.log('receiving data from client: ', data.isScreen);
                 const { isScreen } = data
                 await roomManager.joinRoom(socket, isScreen)
             })
 
             socket.on('disconnect', () => {
-                roomManager.leaveRoom(socket);
-                console.log('disconnected');
-            })
-
-            socket.on('changeRoom', (data: { isScreen: boolean }) => {
-                const { isScreen } = data;
-                roomManager.changeRoom(socket, isScreen)
-            })
-
-            socket.on('sendPing', (id: string) => {
-                socket.emit('getPong', id)
+                roomManager.leaveRoom(socket)
             })
 
             socket.on('U' /* short for updateDude */, (updates: any) => {
@@ -36,6 +24,10 @@ export default class Game {
                 if (!roomManager.userExists(socket.room, socket.id)) return
 
                 roomManager.rooms[socket.room].users[socket.id].lastUpdate = Date.now()
+                //roomManager.rooms[socket.room].scene.events.emit('U' /* short for updateDude */, {
+                //    clientId: socket.clientId,
+                //    updates
+                //})
             })
 
             socket.on('getInitialState', () => {
@@ -49,7 +41,7 @@ export default class Game {
                     connectCounter: roomManager.getRoomUsersArray(socket.room).length,
                     initialState: true,
                     roomId: socket.room
-                };
+                }
 
                 socket.emit('S' /* short for syncGame */, payload)
                 // ioNspGame.in(socket.room).emit('S' /* short for syncGame */, payload)

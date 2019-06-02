@@ -90,6 +90,9 @@
     <TypeScriptCompile Include="src\server\server.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\server\socket\controller.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\server\socket\game.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
