@@ -4,6 +4,7 @@ export interface GameSocket extends EngineSocket {
     join(room: string): void;
     clientId: number;
     room: string;
+    isScreen: boolean;
 }
 
 export interface User {

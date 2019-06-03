@@ -23,13 +23,10 @@ const port = process.env.PORT || 3000
 const ioNspGame = io.of('/G' /* short for game */)
 const ioNspController = io.of('/C' /* short for controller */)
 
-const roomManager = new RoomManager(ioNspGame)
+const roomManager = new RoomManager(ioNspGame, ioNspController)
 
 // /G namespace
 const ioGame = new Game(ioNspGame, roomManager);
-
-// /C namespace
-const ioController = new Controller(ioNspController, roomManager);
 
 app.use(helmet())
 app.use(compression())

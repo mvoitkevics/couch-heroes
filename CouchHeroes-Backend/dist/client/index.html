@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>Couch Heroes</title>
     <link rel="stylesheet" href="static/css/styles.css" type="text/css"/>
 </head>
 <body>
@@ -20,9 +20,9 @@
 
         <h2 class="room-header">Room Information</h2>
 
-        <form class="room-container">
-            <p><input type="text" placeholder="ROOM ID eg. HXCD"></p>
-            <p><input type="text" placeholder="Enter Hero name"></p>
+        <form class="room-container" method="GET" action="/room">
+            <p><input style="text-transform: uppercase;" pattern="[a-zA-Z]{4}" type="text" placeholder="4-LETTER CODE" maxlength="4" name="roomID"></p>
+            <p><input type="text" placeholder="Enter Hero name" name="heroName"></p>
             <p><input type="submit" value="JOIN ROOM"></p>
         </form>
     </div>

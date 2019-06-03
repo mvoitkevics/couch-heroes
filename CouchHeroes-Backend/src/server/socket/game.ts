@@ -9,12 +9,11 @@ export default class Game {
     constructor(public ioNspGame: SocketIO.Namespace, public roomManager: RoomManager) {
         ioNspGame.on('connection', async (socket: GameSocket) => {
             console.log('connected');
-            roomManager.generateClientId(socket)
+            roomManager.generateClientId(socket, true)
 
-            socket.on('joinRoom', async (data: { isScreen: boolean }) => {
-                console.log('receiving data from client: ', data.isScreen);
-                const { isScreen } = data
-                await roomManager.joinRoom(socket, isScreen)
+            socket.on('joinRoom', async () => {
+                console.log('receiving data from client: ');
+                await roomManager.joinRoom(socket)
             })
 
             socket.on('disconnect', () => {
@@ -22,9 +21,8 @@ export default class Game {
                 console.log('disconnected');
             })
 
-            socket.on('changeRoom', (data: { isScreen: boolean }) => {
-                const { isScreen } = data;
-                roomManager.changeRoom(socket, isScreen)
+            socket.on('changeRoom', () => {
+                roomManager.changeRoom(socket)
             })
 
             socket.on('sendPing', (id: string) => {

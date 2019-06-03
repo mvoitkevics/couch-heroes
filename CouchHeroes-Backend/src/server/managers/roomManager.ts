@@ -1,5 +1,4 @@
-﻿import uuidv4 from 'uuid/v4'
-import { GameSocket, Rooms, Users, Room, User } from '../customTypes';
+﻿import { GameSocket, Rooms, Users, Room, User } from '../customTypes';
 
 const MAX_PLAYERS_PER_ROOM = 4
 const USER_KICK_TIMEOUT = 60000
@@ -7,30 +6,31 @@ const USER_KICK_TIMEOUT = 60000
 export default class RoomManager {
     rooms: Rooms = {}
 
-    constructor(public ioNspGame: SocketIO.Namespace) {
+    constructor(public ioNspGame: SocketIO.Namespace, public ioNspController: SocketIO.Namespace) {
         setInterval(() => {
             this.removeInactiveRooms()
             this.removeInactiveUsers()
         }, 10000)
     }
 
-    generateClientId(socket: GameSocket) {
+    generateClientId(socket: GameSocket, isScreen: boolean) {
         let clientId = Math.random() * 1000;
         socket.clientId = clientId;
+        socket.isScreen = isScreen;
         socket.emit('clientId', clientId);
     }
 
     // the 2 functions below should be better
-    async joinRoom(socket: GameSocket, isScreen: boolean) {
+    async joinRoom(socket: GameSocket) {
         socket.room = this.chooseRoom();
 
         // create a new game instance if this room does not exist yet
         if (!this.rooms[socket.room]) {
             await this.createRoom(socket.room)
         }
-        console.log('hello: ', isScreen);
+        console.log('hello: ', socket.isScreen);
         // dont add user if its a screen
-        if (!isScreen) {
+        if (!socket.isScreen) {
             this.addUser(socket)
         } else {
             // join the socket room
@@ -49,9 +49,9 @@ export default class RoomManager {
             .emit('S' /* short for syncGame */, { connectCounter: this.getRoomUsersArray(socket.room).length })
     }
 
-    async changeRoom(socket: GameSocket, isScreen: boolean) {
+    async changeRoom(socket: GameSocket) {
         this.leaveRoom(socket)
-        await this.joinRoom(socket, isScreen)
+        await this.joinRoom(socket)
         socket.emit('changingRoom')
     }
 

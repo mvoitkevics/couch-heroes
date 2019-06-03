@@ -14,11 +14,19 @@ export default class Routes {
             res.sendFile(path.join(__dirname, '../../src/client/index.html'))
         });
 
-        // Server Side
-        this.router.get('/:roomID', (_req, res) => {
-            // res.sendFile(path.join(__dirname, '../../dist/client/views/room.html'))
+        // Server Side 
+        this.router.get('/room', (_req, res) => {
+            const { roomID } = _req.query;
 
-            res.render(path.join(__dirname, '../../src/server/routes/views/room'))
+            if (roomID && roomID !== '') {
+                if (!roomManager.roomExists(roomID)) {
+                    res.render(path.join(__dirname, '../../src/server/routes/views/controller'), _req.query)
+                } else {
+                    res.redirect('/?status=false');
+                }
+            } else {
+                res.redirect('/?status=false');
+            }
         })
     }
 }

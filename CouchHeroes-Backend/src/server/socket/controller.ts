@@ -8,11 +8,12 @@ export default class Controller {
 
     constructor(public ioNspController: SocketIO.Namespace, public roomManager: RoomManager) {
         ioNspController.on('connection', async (socket: GameSocket) => {
-            roomManager.generateClientId(socket)
+
+            console.log('controller connected');
+            roomManager.generateClientId(socket, false)
 
             socket.on('joinRoom', async (data: { isScreen: boolean }) => {
-                const { isScreen } = data
-                await roomManager.joinRoom(socket, isScreen)
+                await roomManager.joinRoom(socket)
             })
 
             socket.on('disconnect', () => {
@@ -24,10 +25,6 @@ export default class Controller {
                 if (!roomManager.userExists(socket.room, socket.id)) return
 
                 roomManager.rooms[socket.room].users[socket.id].lastUpdate = Date.now()
-                //roomManager.rooms[socket.room].scene.events.emit('U' /* short for updateDude */, {
-                //    clientId: socket.clientId,
-                //    updates
-                //})
             })
 
             socket.on('getInitialState', () => {
@@ -44,7 +41,6 @@ export default class Controller {
                 }
 
                 socket.emit('S' /* short for syncGame */, payload)
-                // ioNspGame.in(socket.room).emit('S' /* short for syncGame */, payload)
             })
         })
     }
