@@ -9,9 +9,14 @@ export default class Routes {
     constructor(public roomManager: RoomManager) {
         this.router = express.Router()
 
-        // Client Side Render
+        // Server Side Render
         this.router.get('/', (_req, res) => {
             res.sendFile(path.join(__dirname, '../../src/client/index.html'))
+        });
+
+        // Client Side Render
+        this.router.get('/game', (_req, res) => {
+            res.sendFile(path.join(__dirname, '../../dist/client/views/room/index.html'))
         });
 
         // Server Side 
@@ -19,7 +24,7 @@ export default class Routes {
             const { roomID } = _req.query;
 
             if (roomID && roomID !== '') {
-                if (!roomManager.roomExists(roomID)) {
+                if (roomManager.roomExists(roomID)) {
                     res.render(path.join(__dirname, '../../src/server/routes/views/controller'), _req.query)
                 } else {
                     res.redirect('/?status=false');

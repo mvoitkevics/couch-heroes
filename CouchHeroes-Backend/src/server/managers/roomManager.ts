@@ -1,6 +1,4 @@
-﻿import { GameSocket, Rooms, Users, Room, User } from '../customTypes';
-
-const MAX_PLAYERS_PER_ROOM = 4
+﻿const MAX_PLAYERS_PER_ROOM = 4
 const USER_KICK_TIMEOUT = 60000
 
 export default class RoomManager {

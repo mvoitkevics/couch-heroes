@@ -2,18 +2,19 @@
   "name": "couch-heroes-backend",
   "version": "0.0.1",
   "description": "CouchHeroes-Backend",
-  "main": "server.js",
   "author": {
-    "name": ""
+    "name": "maksims.voitkevics"
   },
+  "main": "server.js",
   "scripts": {
     "start": "npm run serve",
-    "typescript": "tsc --build",
     "dev": "npm-run-all --parallel server client",
     "server": "npm-run-all --parallel server:*",
     "server:webpack": "webpack --config webpack/webpack.server.js --watch",
     "server:nodemon": "nodemon dist/server/server.js",
+    "stats": "webpack --config webpack/webpack.stats.js --watch",
     "client": "webpack --config webpack/webpack.client.js --watch",
+    "physics": "webpack --config webpack/webpack.physics.js --watch",
     "build": "webpack --config webpack/webpack.client.js && webpack --config webpack/webpack.server.js",
     "serve": "node dist/server/server.js",
     "prettier": "prettier --write 'src/**/*.ts'",
@@ -29,6 +30,7 @@
     "express": "^4.16.4",
     "helmet": "^3.16.0",
     "moment": "^2.24.0",
+    "phaser": "^3.17.0",
     "pidusage": "^2.0.17",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",

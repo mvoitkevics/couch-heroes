@@ -1,6 +1,6 @@
 ﻿import RoomManager from '../managers/roomManager'
-import { GameSocket } from '../customTypes';
 import SocketIO from 'socket.io';
+import '../../constants';
 
 /** Handles all the communication for /game namespace (ioNspGame) */
 export default class Game {

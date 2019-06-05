@@ -5,15 +5,15 @@ const webpack = require('webpack')
 
 module.exports = {
     mode: 'development',
-    entry: ['./src/client/index.ts'],
+    entry: ['./src/client/views/room/index.ts'],
     output: {
-        publicPath: 'static/client',
-        path: path.resolve(__dirname, '../dist/client'),
+        publicPath: 'static/views/room/',
+        path: path.resolve(__dirname, '../dist/client/views/room'),
         filename: '[name].bundle.js',
         chunkFilename: '[name].chunk.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx', '.js'],
     },
     module: {
         rules: [
@@ -37,10 +37,10 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'src/client/index.html'
+            template: 'src/client/views/room/index.html'
         }),
         new CopyWebpackPlugin([{ from: 'src/client/css', to: 'css' }]),
-        new CopyWebpackPlugin([{ from: 'src/client/views', to: 'views' }]),
+        new CopyWebpackPlugin([{ from: 'src/client/views/room/assets', to: 'views/room/assets' }]),
         new webpack.DefinePlugin({
             PHYSICS_DEBUG: JSON.stringify(false)
         })

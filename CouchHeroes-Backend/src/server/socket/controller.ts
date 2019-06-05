@@ -1,5 +1,5 @@
 ﻿import RoomManager from '../managers/roomManager'
-import { GameSocket } from '../customTypes';
+
 import SocketIO from 'socket.io';
 
 /** Handles all the communication for /controller namespace (ioNspController) */
@@ -8,8 +8,6 @@ export default class Controller {
 
     constructor(public ioNspController: SocketIO.Namespace, public roomManager: RoomManager) {
         ioNspController.on('connection', async (socket: GameSocket) => {
-
-            console.log('controller connected');
             roomManager.generateClientId(socket, false)
 
             socket.on('joinRoom', async (data: { isScreen: boolean }) => {
